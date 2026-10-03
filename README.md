@@ -1,46 +1,85 @@
-# 📝 NotepadPro Advanced
+# NotepadPro-Advanced 1.0.0 (Java Swing + MySQL)
 
-A desktop-based note-taking application built using **Java Swing** and **MySQL**. NotepadPro Advanced allows users to create, edit, delete, search, categorize, favorite, and archive notes with persistent database storage using JDBC.
+A desktop note-taking app built with **Java Swing** for the UI and
+**MySQL** for storage. Same layout as the original: menu bar, top search
+bar, categories tree, notes list, and a note editor panel.
 
----
+## Features
+- Categories sidebar (All Notes + General/Work/Personal/Ideas/Archive, plus custom categories)
+- Notes list with search (by title/body/tags)
+- Note editor: Title, Category, Tags, body text area with live word count
+- Favorite and Archive toggles
+- Status bar: save confirmation, word count, live clock
+- Left icon rail: New / Save / Delete / Favorite / Archive
 
-## ✨ Features
+## Requirements
+- Java 17+ (JDK, not just JRE, since you need `javac`/Maven to build)
+- Maven 3.6+
+- A running MySQL server (5.7+ or 8.x)
 
-- 📝 Create new notes
-- ✏️ Edit existing notes
-- 🗑️ Delete notes
-- 🔍 Search notes by title, body, or tags
-- 📂 Organize notes using categories
-- ⭐ Mark notes as favorites
-- 📦 Archive and unarchive notes
-- ➕ Add custom categories
-- 🗂️ Delete categories
-- 💾 Persistent data storage using MySQL
-- 🔗 JDBC-based database connectivity
-- 🎨 User-friendly Java Swing interface
-- ⚡ Automatic creation of default categories
+## 1. Set up the database
 
----
+```bash
+mysql -u root -p < schema.sql
+```
 
-## 🛠️ Technologies Used
+This creates a `notepadpro` database with `categories` and `notes` tables,
+and seeds the default categories.
 
-| Technology | Purpose |
-|---|---|
-| Java | Core application development |
-| Java Swing | Graphical User Interface |
-| MySQL | Database management |
-| JDBC | Java-MySQL connectivity |
-| Maven | Project and dependency management |
-| SQL | Database operations |
-| OOP | Application design and structure |
+## 2. Configure the connection
 
----
+Edit `src/main/resources/db.properties`:
 
-## 🗄️ Database
+```properties
+db.url=jdbc:mysql://localhost:3306/notepadpro?useSSL=false&serverTimezone=UTC
+db.user=root
+db.password=yourpassword
+```
 
-The application uses **MySQL** to store notes and categories.
+Alternatively, override at launch without editing the file:
 
-### Database Name
+```bash
+java -Ddb.url=jdbc:mysql://localhost:3306/notepadpro \
+     -Ddb.user=root -Ddb.password=yourpassword \
+     -jar target/NotepadPro-Advanced.jar
+```
 
-```text
-notepadpro
+## 3. Build
+
+```bash
+mvn clean package
+```
+
+This produces a runnable "fat jar" (MySQL driver bundled in) at:
+
+```
+target/NotepadPro-Advanced.jar
+```
+
+## 4. Run
+
+```bash
+java -jar target/NotepadPro-Advanced.jar
+```
+
+## Project structure
+
+```
+NotepadPro-Advanced-Swing/
+├── pom.xml                                    # Maven build config (MySQL driver + shade plugin)
+├── schema.sql                                 # MySQL schema + default categories
+├── README.md
+└── src/main/
+    ├── java/com/notepadpro/
+    │   ├── Main.java                          # entry point
+    │   ├── Note.java                          # note data model
+    │   ├── DatabaseManager.java               # JDBC/MySQL data access layer
+    │   └── NotepadProFrame.java                # Swing UI (menu, search bar, tree, list, editor)
+    └── resources/
+        └── db.properties                      # DB connection settings
+```
+
+## Notes
+This is a clean-room recreation inspired by the layout in the provided
+screenshot. Feel free to extend it further — e.g. category renaming,
+rich text formatting, or exporting notes.
